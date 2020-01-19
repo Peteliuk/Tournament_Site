@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}{{ user.name }} {{ user.surname }}{% endblock %}
+{% block content %}
+	<nav class="navbar navbar-expand-lg navbar-dark bg-success sticky-top">
+		<a class="navbar-brand" href="{{ url_for('index') }}">Tournaments</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+			<div class="navbar-nav ml-auto">
+				{% if user %}
+					<a class="nav-item nav-link" href="{{ url_for('user') }}">{{ user.name }} {{ user.surname }}</a>
+					{% if user.admin %}
+						<a class="nav-item nav-link" href="{{ url_for('admin') }}">admin</a>
+					{% endif %}
+				{% else %}
+					<a class="nav-item nav-link" href="{{ url_for('login') }}">sign in</a>
+				{% endif %}
+			</div>
+		</div>
+	</nav>
+
+
+	<div class="container bg-white py-5 w-100" style="height: 100%">
+		<h2 class="text-center text-uppercase mb-5">Users</h2>
+		{% if users %}
+			{% for user in users %}
+				<form class="form-inline w-100">
+					<div class="form-group ml-auto mb-2 w-75">
+						<input class="form-control w-100" type="text" placeholder="{{ user.name }} {{ user.surname }}" readonly>
+					</div>
+					<a href="{{ url_for('make_admin', user_id = user.id) }}" class="btn btn-success mb-2">Make andmin</a>
+					<a href="{{ url_for('delete_user_admin', user_id = user.id) }}" class="btn btn-secondary mb-2 mr-4">Delete user</a>
+				</form>
+			{% endfor %}
+		{% endif %}
+		<hr class="my-5">
+		<h2 class="text-center text-uppercase mb-5">Tournaments</h2>
+		{% if tournaments %}
+			{% for tournament in tournaments %}
+				<form class="form-inline w-100">
+					<div class="form-group ml-auto mb-2 w-75">
+						<input class="form-control w-100" type="text" placeholder="{{ tournament.name }}" readonly>
+					</div>
+					<a href="{{ url_for('delete_tournament_admin', tournament_id = tournament.id) }}" class="btn btn-secondary mb-2 mx-4">Delete tournament</a>
+				</form>
+			{% endfor %}
+		{% endif %}
+	</div>
+{% endblock %}

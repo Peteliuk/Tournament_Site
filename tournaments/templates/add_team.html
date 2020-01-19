@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Add team{% endblock %}
+{% block content %}
+	<nav class="navbar navbar-expand-lg navbar-dark bg-success sticky-top">
+		<a class="navbar-brand" href="{{ url_for('index') }}">Tournaments</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+			<div class="navbar-nav ml-auto">
+				{% if user %}
+					<a class="nav-item nav-link" href="{{ url_for('user') }}">{{ user.name }} {{ user.surname }}</a>
+					{% if user.admin %}
+						<a class="nav-item nav-link" href="{{ url_for('admin') }}">admin</a>
+					{% endif %}
+				{% else %}
+					<a class="nav-item nav-link" href="{{ url_for('login') }}">sign in</a>
+				{% endif %}
+			</div>
+		</div>
+	</nav>
+
+
+	<div class="container py-5">
+		<h2 class="text-center text-uppercase">Add team</h2>
+
+		<form method="POST" class="mx-auto my-5 w-50">
+			<div class="form-group">
+				<label for="userName">Name</label>
+				<input type="text" class="form-control" id="userName" name="name" required>
+			</div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+			{% with flash = get_flashed_messages() %}
+				{% if flash %}
+					{% for fl in flash %}
+						<hr>
+						<span class="error">{{fl}}</span>
+					{% endfor %}
+				{% endif %}
+			{% endwith %}
+		</form>
+	</div>
+{% endblock %}

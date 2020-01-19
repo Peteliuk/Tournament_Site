@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}{{ user.name }} {{ user.surname }}{% endblock %}
+{% block content %}
+	<nav class="navbar navbar-expand-lg navbar-dark bg-success sticky-top">
+		<a class="navbar-brand" href="{{ url_for('index') }}">Tournaments</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+			<div class="navbar-nav ml-auto">
+				{% if user %}
+					<a class="nav-item nav-link" href="{{ url_for('user') }}">{{ user.name }} {{ user.surname }}</a>
+					{% if user.admin %}
+						<a class="nav-item nav-link" href="{{ url_for('admin') }}">admin</a>
+					{% endif %}
+				{% else %}
+					<a class="nav-item nav-link" href="{{ url_for('login') }}">sign in</a>
+				{% endif %}
+			</div>
+		</div>
+	</nav>
+
+
+	<div class="container py-5">
+		{% with flash = get_flashed_messages() %}
+			{% if flash %}
+				{% for fl in flash %}
+					<hr>
+					<span class="error">{{fl}}</span>
+				{% endfor %}
+			{% endif %}
+		{% endwith %}
+		<h2 class="text-center text-uppercase">Hello {{ user.name }} {{ user.surname }} How are you? :)</h2>
+
+		<div class="row my-5">
+			<div class="col">
+				<h3 class="mx-auto w-50">About you:</h3>
+				<ul class="mx-auto w-50">
+					<li><u><i>Name</i></u>:<br> {{ user.name }}</li>
+					<li><u><i>Surname</i></u>:<br> {{ user.surname }}</li>
+					<li><u><i>Email</i></u>:<br> {{ user.email }}</li>
+					<li><u><i>pass</i></u>:<br> {{ user.password }}</li>
+				</ul>
+			</div>
+			<div class="col">
+				<h3>Options:</h3>
+				<a class="btn btn-success text-white w-50 my-1" href="{{ url_for('update') }}">update account</a>
+				<a class="btn btn-success text-white w-50 my-1" href="{{ url_for('create_tournament')}}">create tournament</a>
+				<a class="btn btn-success text-white w-50 my-1" data-toggle="modal" data-target="#deleteUserModal">delete account</a>
+				<a class="btn btn-success text-white w-50 my-1" href="{{ url_for('logout') }}">Logout</a>
+			</div>
+		</div>
+		<hr>
+		<h2>Your tournaments:</h2>
+		{% if tournaments %}
+			{% for tournament in tournaments %}
+				<div class="card w-75 mx-auto my-5">
+					<div class="card-header">
+						<h4>{{ tournament.name }}</h4>
+					</div>
+					<div class="card-body">
+						<p>{{ tournament.description }}</p>
+						<div class="row">
+							<div class="col">
+								<h5>Participants:</h5>
+								<ul>
+									{% for team in select_teams(user.id, tournament.id) %}
+										<li>{{ team.name }}</li>
+									{% endfor %}
+								</ul>
+							</div>
+							<div class="col">
+								<h5>Matches:</h5>
+								<ul>
+									{% for match in select_matches(tournament.id) %}
+										<li>{{ get_team_name(match.team_home_id) }} vs {{ get_team_name(match.team_guest_id) }} in tour {{ match.tour }}</li>
+									{% endfor %}
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="card-footer">
+						<a href="{{ url_for('edit_tournament', user_id = user.id, tournament_id = tournament.id) }}" class="btn btn-success">Edit tournament</a>
+						<a href="{{ url_for('delete_tournament', name = tournament.name )}}" class="btn btn-secondary ml-3">Delete tournament</a>
+					</div>
+				</div>
+			{% endfor %}
+		{% else %}
+			<div class="w-50 h-50 p-5 mx-auto my-4 bg-secondary text-white">
+				<h5>You have no tournaments yet</h5>
+			</div>
+		{% endif %}
+	</div>
+
+	<!-- Modal for deleting user -->
+	<div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<h5>Are you shure about deleting your account?</h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success" data-dismiss="modal">No</button>
+					<a href="{{ url_for('delete') }}" class="btn btn-secondary">Yes</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

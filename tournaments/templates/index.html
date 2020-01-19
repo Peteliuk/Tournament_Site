@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Home page{% endblock %}
+{% block content %}
+	<nav class="navbar navbar-expand-lg navbar-dark bg-success sticky-top">
+		<a class="navbar-brand" href="{{ url_for('index') }}">Tournaments</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+			<div class="navbar-nav ml-auto">
+				{% if user %}
+					<a class="nav-item nav-link" href="{{ url_for('user') }}">{{ user.name }} {{ user.surname }}</a>
+					{% if user.admin %}
+						<a class="nav-item nav-link" href="{{ url_for('admin') }}">admin</a>
+					{% endif %}
+				{% else %}
+					<a class="nav-item nav-link" href="{{ url_for('login') }}">sign in</a>
+				{% endif %}
+			</div>
+		</div>
+	</nav>
+
+
+	<div class="container pt-5">
+		<h2 class="text-center">Tournament list</h2>
+		{% with flash = get_flashed_messages() %}
+			{% if flash %}
+				{% for fl in flash %}
+					<hr>
+					<span class="error">{{fl}}</span>
+				{% endfor %}
+			{% endif %}
+		{% endwith %}
+		{% if tournaments %}
+			{% for tournament in tournaments %}
+				{% if tournament[1] %}
+					<div class="card w-75 mx-auto my-5">
+						<div class="card-header">
+							<p>{{ tournament[0].name }} {{ tournament[0].surname }}</p>
+						</div>
+						<div class="card-body">
+							<h5 class="card-title">{{ tournament[1].name }}</h5>
+							<p class="card-text">{{ tournament[1].description }}</p>
+							<div class="row">
+								<div class="col">
+									<h5>Participants:</h5>
+									<ul>
+										{% for team in select_teams(tournament[0].id, tournament[1].id) %}
+											<li>{{ team.name }}</li>
+										{% endfor %}
+									</ul>
+								</div>
+								<div class="col">
+									<h5>Matches:</h5>
+									<ul>
+										{% for match in select_matches(tournament[1].id) %}
+											<li>{{ get_team_name(match.team_home_id) }} vs {{ get_team_name(match.team_guest_id) }} in tour {{ match.tour }}</li>
+										{% endfor %}
+									</ul>
+								</div>
+							</div>
+							<div class="card-footer">
+								{% if user %}
+									<a href="{{ url_for('add_team', user_id = tournament[0].id, tournament_id = tournament[1].id) }}" class="btn btn-primary">Become a participant</a>
+								{% else %}
+									<a href="{{ url_for('login') }}" class="btn btn-primary">Become a participant</a>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				{% endif %}
+			{% endfor %}
+		{% else %}
+			<div class="w-50 h-50 p-5 mx-auto my-4 bg-secondary text-white">
+				<h5>You have no tournaments yet</h5>
+			</div>
+		{% endif %}
+	</div>
+{% endblock %}
